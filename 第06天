@@ -1,1 +1,124 @@
 算法学习|第六天|代码随想录
+哈希表（Hash table），也称为散列表
+
+哈希碰撞，同时映射到一个下标
+解决方式：
+拉链法和线性探测法。
+
+拉链法：
+选择适当的哈希表的大小。
+（数据规模是dataSize，哈希表的大小为tableSize）
+
+线性探测法：
+tableSize大于dataSize。
+
+三种常见的哈希结构
+·数组
+·set（集合）
+·map（映射）
+
+题目一：
+242.有效的字母异位词
+给定两个字符串s和t，编写一个函数来判断t是否是s的字母异位词。
+代码：
+class Solution {
+public:
+  bool isAngram(string s, string t) {
+    int record[26] = {0};
+    for (int i=0; i<s.size(); i++) {
+      // a的ASCII的相对数值
+      record[s[i] - 'a']++;
+    }
+    for (int i=0; i<t.size(); i++) {
+      record[t[i] - 'a']--;
+    }
+    for (int i=0; i<26; i++) {
+      if (record[i] != 0) {
+        // record 数组如果有的元素不为零，说明字符串s和t并非是字母异位词
+        return false;
+      }
+    }
+    // record 数组所有元素都为零，说明字符串 s和t是字母异位词。
+    return ture;
+  }
+};
+
+题目二：
+349.两个数组的交集
+给定两个数组，编写一个函数来计算它们的交集。
+哈希数据结构：unordered_set
+代码：
+class Solution {
+public:
+  vector<int> intersection(vector<int>& nums_1, vector<int>& nums_2) {
+    // 存放结果，用set给结果集去重复的内容    
+    unordered_set<int> result_set;
+    unordered_set<int> nums_set(nums_1.begin(), nums_1.end());
+    for (int num : nums_2) {
+      // 发现 nums_2 的元素 在 nums_1 里又出现过
+      if (nums_set.find(num) != nums_set.end()) {
+        result_set.insert(num);
+      }
+    }
+    return vector<int>(result_set.begin(), result_set.end());
+  }
+};
+
+
+题目三：
+202.快乐数
+编写一个算法来判断一个数 n 是不是快乐数。
+快乐数」定义为：对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和，
+然后重复这个过程直到这个数变为 1，也可能是 无限循环 但始终变不到 1。
+如果 可以变为  1，那么这个数就是快乐数。
+class Solution {
+public:
+  // 去数值各个位上的单数之和
+  int getSum(int n) {
+    int sum = 0;
+    while (n) {
+      sum += (n % 10) * (n % 10);
+      n /= 10;
+    }
+    return sum;
+  }
+  bool isHappy(int n) {
+    unordered_set<int> set;
+    while(1) {
+      int sum = getSum(n);
+      if (sum == 1) {
+        return true;
+      }
+      // 如果这个sum曾经出现过，说明无限循环开始，立即return false
+      if (set.find(sum) != set.end()) {
+        return false;
+      } else {
+        set.insert(sum);
+      }
+      n = sum;
+    }
+  }
+};
+
+
+第四题：
+1.两数之和
+给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
+代码：
+class Solution {
+public:
+  vector<int> twoSum(vector<int>& nums, int target) {
+    std::unordered_map <int, int> map;
+    for (int i=0; i<nums.size(); i++) {
+      // 遍历当前元素，并在 map 中寻找是否有匹配的 key
+      auto iter = map.find(target - nums[i]);
+      if (iter != map.end()) {
+        return {iter->second, i};
+      }
+      // 如果没有找到配对，就把访问过的元素和下标加入到 map 中
+      mpa.insert(pair<int, int>(nums[i], i));
+    }
+    return {};
+  }
+}
