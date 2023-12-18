@@ -1,0 +1,140 @@
+算法学习|第四天|代码学习录
+链表 part02
+题目一：
+24. 两两交换链表中的节点 
+给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。
+class Solution {
+public:
+  ListNode* swapPairs(ListNode* head) {
+    // 设置一个虚拟头结点
+    ListNode* dummyHead = new ListNode(0);
+    // 将虚拟头结点指向head
+    dummyHead->next = head;
+    ListNode* cur = dummyHead;
+    while (cur->next != nullptr && cur->next->next != nullptr) {
+      // 记录临时节点
+      ListNode* temp = cur->next;
+      ListNode* temp_1 = cur->next->next->next;
+
+      cur->next = cur->next->next;
+      cur->next->next = temp;
+      cur->next->next->next = temp_1;
+
+      // cur 移动两位，准备下一轮交换
+      cur = cur->next->next;
+    }
+    return dummpyHead->next;
+  }
+};
+
+第二题：
+19.删除链表的倒数第N个节点
+给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+做题思路：
+双指针，fast和slow移动
+定义fast和slow指针，初始值为虚拟头结点
+fast先走n+1步，同时移动slow才能指向删除节点的上一个节点
+fast和slow同时移动，直到fast指向末尾
+删除slow指向的下一个节点
+
+代码内容：
+class Solution {
+public:
+  ListNode* removeNthFromEnd(ListNode* head, int n) {
+    ListNode* dummyHead = new ListNode(0);
+    dummyHead->next = head;
+    ListNode* slow = dummyHead;
+    ListNode* fast = dummyHead;
+    while(n-- && fast != NULL) {
+      fast = fast->next;
+    }
+    // fast 再提前走一步，需要让 slow 指向删除节点的上一个节点
+    fast = fast->next;
+    while (fast!=NULL) {
+      fast = fast->next;
+      slow = slow->next;
+    }
+    slow->next = slow->next->next;
+    return dummyHead->next;
+  }
+};
+  
+
+第三题：
+面试题 02.07. 链表相交
+给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。
+如果两个链表没有交点，返回 null 。 
+思路：
+求两个链表交点节点的指针。
+class Solution {
+public:
+  ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+    ListNode* curA = headA;
+    ListNode* curB = headB;
+    int lenA = 0, lenB = 0;
+    while (curA != NULL) {
+      // 求链表A的长度
+      lenA++;
+      curA = curA->next;
+    }
+    while (curB != NULL) {
+      // 求链表B的长度
+      lenB++;
+      curB = curB->next;
+    }
+    curA = headA;
+    curB = headB;
+    // 让curA为最长链表的头，lenA为其长度
+    if (lenB > lenA) {
+      swap (lenA, lenB);
+      swap (curA, curB);
+    }
+    // 求长度差
+    int gap = lenA - lenB;
+    // 让curA和curB在同一个起点上（末尾位置对齐）
+    while (gap--) {
+      curA = curA->next;
+    }
+    // 遍历curA和curB,遇到相同则直接返回
+    while(curA != NULL) {
+      if (curA == curB) {
+        return curA;
+      }
+      curA = curA->next;
+      curB = curB->next;
+    }
+    return NULL;
+  }
+};
+
+  
+
+第四题：
+142.环形链表II 
+给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+思路：
+判断链表是否环
+如果有环，如何找到环的入口。
+class Solution {
+public:
+  ListNode *detectCycle(ListNode* head) {
+    ListNode* fast = head;
+    ListNode* slow = head;
+    while (fast != NULL && fast->next != NULL) {
+      slow = slow->next;
+      fast = fast->next->next;
+      // 快慢指针相遇，此时从 head 和相遇点，同时查找直至相遇
+      if (slow == fast) {
+        ListNode* index_1 = fast;
+        ListNode* index_2 = head;
+        while (index_1 == index_2) {
+          index_1 = index_1->next;
+          index_2 = index_2->next;
+        }
+        // 返回环的入口
+        return index_2;
+      }
+    }
+    return NULL;
+  }
+};
