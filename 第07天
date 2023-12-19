@@ -1,0 +1,142 @@
+算法学习|第七天|代码随想录
+哈希表
+
+第一题：
+第454题.四数相加Ⅱ
+给定四个包含整数的数组列表 A , B , C , D ,计算有多少个元组 (i, j, k, l) ，使得 A[i] + B[j] + C[k] + D[l] = 0。
+为了使问题简单化，所有的 A, B, C, D 具有相同的长度 N，且 0 ≤ N ≤ 500 。所有整数的范围在 -2^28 到 2^28 - 1 之间，最终结果不会超过 2^31 - 1 。
+解题思路：
+·定义一个unordered_map，key放a和b两数之和，value放a和b两数之和出现的次数。
+·遍历A和B数组，统计两个数组元素之和，和出现的次数，放到map中。
+·定义int变量count，用来统计a+b+c+d=0出现的次数。
+·再遍历C和D数组，找到如果0-(c+d) 在map中出现过的话，就用count把map中key对应的value出现的次数统计出来。
+·最后返回统计值count。
+
+代码：
+class Solution {
+public:
+  int fourSumCount(vector<int>& A, vector<int>& B, vector<int>& C, vector<int>& D) {
+    // key：a+b的数值， value：a+b数值出现的次数
+    unordered_map<int, int> umap;
+    // 遍历A和B数组，统计两个数组元素之和，和出现的次数，放在map中
+    for (int a : A) {
+      for (int b : B) {
+        umap[a + b]++;
+      }
+    }
+    // 统计 a + b + c + d = 0 出现的次数
+    int count = 0;
+    // 再遍历C和D数组，如果 0-(c+d) 在map中出现的话，
+    // 就把map中对应的value出现的次数统计出来。
+    for (int c : C) {
+      for (int d : D) {
+        if (umap.find(0 - (c + d)) != umap.end()) {
+          count += umap[0 - (c + d)];
+        }
+      }
+    }
+    return count;
+  }
+};
+
+
+第二题：
+383.赎金信
+给定一个赎金信 (ransom) 字符串和一个杂志(magazine)字符串，判断第一个字符串 ransom 能不能由第二个字符串 magazines 里面的字符构成。
+如果可以构成，返回 true ；否则返回 false。
+(题目说明：为了不暴露赎金信字迹，要从杂志上搜索各个需要的字母，组成单词来表达意思。
+ 杂志字符串中的每个字符只能在赎金信字符串中使用一次。)
+
+方法一：
+暴力解法
+class Solution {
+public:
+  bool canConstruct(string ransomNote, string magazine) {
+    for (int i=0; i<magazine.length(); i++) {
+      for (int j=0; j<ransomNote.length(); j++) {
+        // 在ransomNote中找到和magazine相同的字符
+        if (magazine[i] == ransomNote[j]) {
+          // ransomNote 删除这个字符
+          ransomNote.erase(ransomNote.begin() + j);
+          bread;
+        }
+      }
+    }
+    // 如果 ransomNote为空，则说明magazine的字符可以组成ransomNote
+    if (ransomNote.length() == 0) {
+      return true;
+    }
+    return false;
+  }
+};
+
+
+方法二：
+哈希解法
+class Solution {
+public:
+  bool canConstruct(string ransomNote, string magazine) {
+    int record[26] = {0};
+    // 添加信息
+    if (ransomNote.size() > magazine.size()) {
+      return false;
+    }
+    for (int i=0; i<magazine.length(); i++) {
+      // 通过record数据记录 magazine里各个字符出现次数
+      record[magazine[i] - 'a']++;
+    }
+    for (int j=0; j<ransomNote.length(); j++) {
+      // 遍历ransomNote，在record里面对应的字符个数做--操作
+      record[ransomNote[j]-'a']--;
+      // 如果小于零说明ransomNote里出现的字符，magazine没有
+      if (record[ransomNote[j]-'a'] < 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+
+第三题：
+第15题. 三数之和
+给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？
+  请你找出所有满足条件且不重复的三元组。
+  注意： 答案中不可以包含重复的三元组。
+
+方法一：  
+哈希解法
+class Solution {
+public:
+  vector<vector<int>> threeSum(vector<int>& nums) {
+    
+  }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
