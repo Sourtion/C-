@@ -109,10 +109,76 @@ public:
 class Solution {
 public:
   vector<vector<int>> threeSum(vector<int>& nums) {
-    
+    vector<vector<int>> result;    
+    sort(sums.begin(), nums.end());
+    // 找出 a + b + c = 0
+    // a = nums[i], b = nums[j], c = -(a + b)
+    for (int i=0; i<nums.size(); i++) {
+      // 排序之后如果第一个元素已经大于零，那么不可能凑成三元组
+      if (nums[i] > 0) {
+        break;
+      }
+      // 三元组元素a去重
+      if (i>0 && nums[i] == nums[i-1]) {
+        continue;
+      }
+      unordered_set<int> set;
+      for (int j=i+1; j<nums.size(); j++) {
+        // 三元组元素b去重
+        if (j>i+2 && nums[j]==nums[j-1] && nums[j-1]==nums[j-2]) {
+          continue;
+        }
+        int c=0-(nums[i] + nums[j]);
+        if (set.find(c) != set.end()) {
+          result.push_back({nums[i], nums[j], c});
+          // 三元组元素 c 去重
+          set.erase(c);
+        } else {
+          set.insert(nums[j]);
+        }
+      }
+    }
+    return result;
   }
-} 
+}; 
 
+方法二：
+双指针
+class Solution {
+public:
+  vector<vector<int>> threeSum(vector<int>& nums) {3
+    vector<vector<int>> results;
+    sort(nums.begin(), nums.end());
+    // 找出 a + b + c = 0
+    // a = nums[i], b = nums[right], c = nums[left]
+    for (int i=0; i<nums.size(); i++) {
+      // 排序之后如果第一个元素大于零，无论如何组合都不可能凑成三元组，则直接返回结果
+      if (nums[0] > 0) {
+        return result;
+      }
+      // 去重a的方法
+      if (i>0 && nums[i]==nums[i-1]) {
+        continue;
+      }
+      int left = i+1;
+      int right = nums.size() - 1;
+      while(right > left) {
+        if (nums[i] + nums[left] + nums[right] > 0) right--;
+        else if (nums[i] + nums[left] + nums[right] < 0) left++;
+        else {
+          result.push_back(vector<int>{nums[i], nums[left], nums[right]});
+          // 去重逻辑应该放在找到一个三元组之后，对b 和 c去重
+          while (right>left && nums[right]==nums[right-1]) right--;
+          while (right > left && nums[left] == nums[left+1]) left++;
+          // 找到对应三元组后，双指针同时收缩
+          right--;
+          left++;
+        }
+      }
+    }
+    return result;
+  }
+};
 
 
 
