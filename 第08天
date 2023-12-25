@@ -1,0 +1,246 @@
+第08天|算法学习|代码随想录
+第一题
+344.反转字符串
+编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 char[] 的形式给出。
+不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
+你可以假设数组中的所有字符都是 ASCII 码表中的可打印字符。
+class Solution {
+public:
+  void reverseString(vector<char>& s) {
+    for (int i=0, j=s.size()-1; i<s.size()/2; i++, j--) {
+      swap(s[i], s[j]);
+    }
+  }
+};
+
+
+第二题
+541.反串字符串Ⅱ
+给定一个字符串 s 和一个整数 k，从字符串开头算起, 每计数至 2k 个字符，就反转这 2k 个字符中的前 k 个字符。
+如果剩余字符少于 k 个，则将剩余字符全部反转。
+如果剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符，其余字符保持原样。
+class Solution {
+public:
+  vodi reverse(string& s, int start, int end) {
+    for (int i = start, j = end; i < j; i++, j--) {
+      swap(s[i], s[j]);
+    }
+  }
+  string severseStr(string s, int k) {
+    for (int i = 0; i < s.size(); i += (2 * k)) {
+      // 1. 每隔 2k 个字符的前 k 个字符串进行翻转
+      // 2. 剩余字符小于 2k 但大于或等于 k 个， 则反转前 k 个字符
+      if (i + k <= s.size()) {
+        reverse(s.begin() + i, s.begin() + i + k);
+      } else {
+        // 3. 剩余字符少于 k 个，则剩余字符全部反转
+        reverse(s.begin() + i, s.end());
+      }
+    }
+    return s;
+  }
+};
+
+
+第三题
+卡码网：54.替换数字
+给定一个字符串 s，它包含小写字母和数字字符，请编写一个函数，将字符串中的字母字符保持不变，而将每个数字字符替换为number。
+例如，对于输入字符串 "a1b2c3"，函数应该将其转换为 "anumberbnumbercnumber"。
+对于输入字符串 "a5b"，函数应该将其转换为 "anumberb"
+输入：一个字符串 s,s 仅包含小写字母和数字字符。
+输出：打印一个新的字符串，其中每个数字字符都被替换为了number
+
+思路：
+先预先给数组扩容带填充后的大小，然后在从后向前进行操作。
+#include<iostream>
+using namespaece std;
+int main() {
+  string s;
+  while (cin >> s) {
+    // 统计数字的个数
+    int count = 0;
+    int sOldSize = s.size();
+    for (int i = 0; i < s.size(); i++) {
+      if (s[i] >= '0' && s[i] <= '9') {
+        count++;
+      }
+    }
+    // 扩充字符串 s 的大小，每个空格替换程 number 之后的大小
+    s.resize(s.size() + count * 5);
+    int sNewSize = s.size();
+    // 从后面讲空格替换为 number
+    for (int i = sNewSize - 1, j = sOldSize - 1; j < i; i--, j--) {
+      if (s[j] > '9' || s[j] < '0') {
+        s[i] = s[j];
+      } else {
+        s[i] = 'r';
+        s[i-1] = 'e';
+        s[i-2] = 'b';
+        s[i-3] = 'm';
+        s[i-4] = 'u';
+        s[i-5] = 'n';
+        i -= 5;
+      }
+    }
+    cout << s << endl;
+  }
+}
+
+
+第四题
+151.翻转字符串里的单词
+给定一个字符串，逐个翻转字符串中的每个单词。
+示例 1：
+输入: "the sky is blue"
+输出: "blue is sky the"
+
+思路：
+  移除多余空格
+  将整个字符串反转
+  将每个单词反转
+  
+方法一：
+双指针
+  先移除字符串前的空格，再移除中间的，再移除后面部分。
+void removeExtraSpaces(string& s) {
+  // 定义快指针和慢指针
+  int slowIndex = 0, fastIndex = 0;
+  // 去掉字符串前面的空格
+  while (s.size() > 0 && fastIndex < s.size() && s[fastIndex] == ' ') {
+    fastIndex++;
+  }
+  for (; fastIndex < s.size(); fastIndex++) {
+    // 去掉字符串中间部分的冗余空格
+    if (fastIndex - 1 > 0 && s[fastIndex - 1] == s[fastIndex] && s[fastIndex] == ' ') {
+      continue;
+    } else {
+      s[slowIndex++] = s[fastIndex];
+    }
+  }
+  // 去掉字符串末尾的空格
+  if (slowIndex - 1 > 0 && s[slowIndex -1] == ' ') {
+    s.resize(slowIndex - 1);
+  } else {
+    // 重新设置字符串大小
+    s.resize(slowIndex);
+  }
+}
+
+方法二：
+  精简代码
+// 去除所有空格并在相邻单词之间添加空格，快慢指针
+void removeExtraSpaces(string& s) {
+  int slow = 0;
+  for (int i = 0; i < s.size(); ++i) {
+    // 遇到非空格就处理，即删除所有空格
+    if (s[i] != ' ') {
+      // 手动控制空格，给单词之间添加空格。slow != 0 说明不是第一个单词，需要在单词前添加空格
+      if (slow != 0) 
+        s[slow++] = ' ';
+      // 补上该单词，遇到空格说明单词结束
+      while (i < s.size() && s[i] != ' ') {
+        s[slow++] = s[i++];
+      }
+    }
+  }
+  // slow 的大小即为去除多余空格后的大小
+  s.resize(slow);
+}
+
+整体代码：
+class Solution {
+public:
+  void reverse(string& s, int start, int end) {
+    // 翻转，区间写法：左闭右闭
+    for (int i = start, j = end; i < j; i++, j--) {
+      swap(s[i], s[j]);
+    }
+  }
+
+  void removeExtraSpaces(string& s) {
+    int slow = 0;
+    for (int i = 0; i < s.size(); ++i) {
+      // 遇到非空格就处理，即删除所有空格
+      if (s[i] != ' ') {
+        // 手动控制空格，给单词之间添加空格。slow != 0 说明不是第一个单词，需要在单词前添加空格
+        if (slow != 0) 
+          s[slow++] = ' ';
+        // 补上该单词，遇到空格说明单词结束
+        while (i < s.size() && s[i] != ' ') {
+          s[slow++] = s[i++];
+        }
+      }
+    }
+    // slow 的大小即为去除多余空格后的大小
+    s.resize(slow);
+  }
+
+  string reverseWords(string s) {
+    // 去除多余空格，保证单词之间只有一个空格，且字符串首尾没有空格
+    removeExtraSpaces(s);
+    reverse(s, 0, s.size() - 1);
+    // removeExtraSpaces 后保证第一个单词的开始下标一定是0。
+    int start = 0;
+    for (int i = 0; i <= s.size(); ++i) {
+      // 到达空格或者串尾，说明一个单词结束。进行翻转
+      if (i == s.size() || s[i] == ' ') {
+        // 翻转，注意是左闭右闭的翻转
+        reverse(s, strat, i - 1);
+        // 更新下一个单词的开始下标 start
+        start = i + 1;
+      }
+    }
+    return s;
+  }
+};
+
+
+第五题：
+卡码网：55.右旋转字符串
+字符串的右旋转操作是把字符串尾部的若干个字符转移到字符串的前面。
+  给定一个字符串 s 和一个正整数 k，请编写一个函数，将字符串中的后面 k 个字符移到字符串的前面，
+  实现字符串的右旋转操作。
+例如，对于输入字符串 "abcdefg" 和整数 2，函数应该将其转换为 "fgabcde"。
+  输入    输入共包含两行，第一行为一个正整数 k，代表右旋转的位数。
+          第二行为字符串 s，代表需要旋转的字符串。
+  
+  输出    输出共一行，为进行了右旋转操作后的字符串。
+
+方法一：
+  整体倒叙，把两段子串顺序颠倒，两个短子串的字符再倒叙一把
+#include<iostream>
+#include<algorithm>
+using namespace std;
+int main() {
+  int n;
+  string s;
+  cin >> s;
+  cin >> n;
+  int len = s.size();
+
+  // 整体反转
+  reverse(s.begin(), s.end());
+  // 先反转前一段，长度为 n
+  reverse(s.begin(), s.begin() + n);
+  // 再反转后一段
+  reverse(s.begin() + n, s.end());
+
+  cout << s << endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
