@@ -1,0 +1,189 @@
+第23天|算法学习|代码随想录
+
+第一题
+669. 修剪二叉搜索树 
+给定一个二叉搜索树，同时给定最小边界L 和最大边界 R。
+通过修剪二叉搜索树，使得所有节点的值在[L, R]中 (R>=L) 。
+你可能需要改变树的根节点，所以结果应当返回修剪好的二叉搜索树的新的根节点。
+代码：
+class Solution {
+public:
+    TreeNode* trimBST(TreeNode* root, int low, int high) {
+        if (root == nullptr) return nullptr;
+        if (root->val < low) return trimBST(root->right, low, high);
+        if (root->val > high) return trimBST(root->left, low, high);
+        root->left = trimBST(root->left, low, high);
+        root->right = trimBST(root->right, low, high);
+        return root;
+    }
+};
+
+方法二：
+迭代法
+class Solution {
+public:
+    TreeNode* trimBST(TreeNode* root, int L, int R) {
+        if (!root) return nullptr;
+
+        // 处理头结点，让root移动到[L, R] 范围内，注意是左闭右闭
+        while (root != nullptr && (root->val < L || root->val > R)) {
+            // 小于L往右走
+            if (root->val < L) root = root->right; 
+            // 大于R往左走
+            else root = root->left; 
+        }
+        TreeNode *cur = root;
+        // 此时root已经在[L, R] 范围内，处理左孩子元素小于L的情况
+        while (cur != nullptr) {
+            while (cur->left && cur->left->val < L) {
+                cur->left = cur->left->right;
+            }
+            cur = cur->left;
+        }
+        cur = root;
+
+        // 此时root已经在[L, R] 范围内，处理右孩子大于R的情况
+        while (cur != nullptr) {
+            while (cur->right && cur->right->val > R) {
+                cur->right = cur->right->left;
+            }
+            cur = cur->right;
+        }
+        return root;
+    }
+};
+
+
+第二题
+108.将有序数组转换为二叉搜索树
+将一个按照升序排列的有序数组，转换为一棵高度平衡二叉搜索树。
+本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过 1。
+解题思路：
+方法一：
+  递归法
+class Solution {
+private:
+    TreeNode* traversal(vector<int>& nums, int left, int right) {
+        if (left > right) return nullptr;
+        int mid = left + ((right - left) / 2);
+        TreeNode* root = new TreeNode(nums[mid]);
+        root->left = traversal(nums, left, mid - 1);
+        root->right = traversal(nums, mid + 1, right);
+        return root;
+    }
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        TreeNode* root = traversal(nums, 0, nums.size() - 1);
+        return root;
+    }
+};
+
+方法二：
+  迭代法
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        if (nums.size() == 0) return nullptr;
+
+        TreeNode* root = new TreeNode(0);   // 初始根节点
+        queue<TreeNode*> nodeQue;           // 放遍历的节点
+        queue<int> leftQue;                 // 保存左区间下标
+        queue<int> rightQue;                // 保存右区间下标
+        nodeQue.push(root);                 // 根节点入队列
+        leftQue.push(0);                    // 0为左区间下标初始位置
+        rightQue.push(nums.size() - 1);     // nums.size() - 1为右区间下标初始位置
+
+        while (!nodeQue.empty()) {
+            TreeNode* curNode = nodeQue.front();
+            nodeQue.pop();
+            int left = leftQue.front(); leftQue.pop();
+            int right = rightQue.front(); rightQue.pop();
+            int mid = left + ((right - left) / 2);
+
+            curNode->val = nums[mid];       // 将mid对应的元素给中间节点
+
+            if (left <= mid - 1) {          // 处理左区间
+                curNode->left = new TreeNode(0);
+                nodeQue.push(curNode->left);
+                leftQue.push(left);
+                rightQue.push(mid - 1);
+            }
+
+            if (right >= mid + 1) {         // 处理右区间
+                curNode->right = new TreeNode(0);
+                nodeQue.push(curNode->right);
+                leftQue.push(mid + 1);
+                rightQue.push(right);
+            }
+        }
+        return root;
+    }
+};
+
+
+第三题：
+538.把二叉搜索树转换为累加树
+给出二叉 搜索 树的根节点，该树的节点值各不相同，
+请你将其转换为累加树（Greater Sum Tree），
+使每个节点 node 的新值等于原树中大于或等于 node.val 的值之和。
+解题思路：
+有序
+
+方法一：
+  递归
+class Solution {
+private:
+    // 记录前一个节点的数值
+    int pre = 0; 
+    // 右中左遍历
+    void traversal(TreeNode* cur) { 
+        if (cur == NULL) return;
+        traversal(cur->right);
+        cur->val += pre;
+        pre = cur->val;
+        traversal(cur->left);
+    }
+public:
+    TreeNode* convertBST(TreeNode* root) {
+        pre = 0;
+        traversal(root);
+        return root;
+    }
+};
+
+方法二：
+  迭代
+class Solution {
+private:
+    // 记录前一个节点的数值
+    int pre; 
+    void traversal(TreeNode* root) {
+        stack<TreeNode*> st;
+        TreeNode* cur = root;
+        while (cur != NULL || !st.empty()) {
+            if (cur != NULL) {
+                st.push(cur);
+                cur = cur->right;   // 右
+            } else {
+                cur = st.top();     // 中
+                st.pop();
+                cur->val += pre;
+                pre = cur->val;
+                cur = cur->left;    // 左
+            }
+        }
+    }
+public:
+    TreeNode* convertBST(TreeNode* root) {
+        pre = 0;
+        traversal(root);
+        return root;
+    }
+};
+
+
+
+
+
+
+
